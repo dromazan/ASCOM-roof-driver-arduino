@@ -15,8 +15,6 @@ boolean closing = false;
 
 unsigned long opening_time = 40000; // time for roof opening in seconds
 
-unsigned long time_count = 0;
-
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
@@ -28,9 +26,9 @@ void setup() {
 	pinMode(sensor_close, INPUT);
 	digitalWrite(sensor_close, HIGH);
 
-	MsTimer2::set(opening_time, stop_roof); //set up timer
-	attachInterrupt(0, is_open, LOW);
-	attachInterrupt(1, is_closed, LOW);
+	MsTimer2::set(opening_time, stop_roof); //setup timer
+	attachInterrupt(0, is_open, LOW); // setup interrupt from open sensor
+	attachInterrupt(1, is_closed, LOW); // setup interrupt from close sensor
 }
 
 // the loop function runs over and over again until power down or reset
@@ -104,61 +102,15 @@ void open_roof()
 	MsTimer2::start(); //start timer
 	opening = true;
 
-	//time_count = millis();
-	
-	//while (millis() < (time_count + opening_time))
-	//{
-	//	if (digitalRead(sensor_open) == LOW)
-	//	{
-	//		opening = false;
-	//		state = 0; // Open
-	//		digitalWrite(relay_open, LOW);
-	//		break;
-	//	}
-	//}
-	//if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW)
-	//{
-	//	digitalWrite(relay_open, LOW);
-	//	state = 4; // Error
-	//}
-	//else
-	//{
-	//	digitalWrite(relay_open, LOW);
-	//	get_state();
-	//}
-	//Serial.print(state);
-	//Serial.print("#");
 }
 
 void close_roof()
 {
+	MsTimer2::start();
 	digitalWrite(relay_open, LOW);
 	digitalWrite(relay_close, HIGH);
 	closing = true;
 
-	//time_count = millis();
-	//while (millis() < (time_count + opening_time))
-	//{
-	//	if (digitalRead(sensor_close) == LOW)
-	//	{
-	//		closing = false;
-	//		state = 1; // Closed
-	//		digitalWrite(relay_close, LOW);
-	//		break;
-	//	}
-	//}
-	//if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW)
-	//{
-	//	digitalWrite(relay_close, LOW);
-	//	state = 4; // Error
-	//}
-	//else
-	//{
-	//	digitalWrite(relay_close, LOW);
-	//	get_state();
-	//}
-	//Serial.print(state);
-	//Serial.print("#");
 }
 
 void stop_roof()
@@ -169,8 +121,6 @@ void stop_roof()
 	opening = false;
 	closing = false;
 	state = 4; // Error
-	Serial.print(state);
-	Serial.print("#");
 }
 
 void is_open()
