@@ -101,64 +101,69 @@ void open_roof()
 {
 	digitalWrite(relay_close, LOW);
 	digitalWrite(relay_open, HIGH);
-	time_count = millis();
+	MsTimer2::start(); //start timer
 	opening = true;
-	while (millis() < (time_count + opening_time))
-	{
-		if (digitalRead(sensor_open) == LOW)
-		{
-			opening = false;
-			state = 0; // Open
-			digitalWrite(relay_open, LOW);
-			break;
-		}
-	}
-	if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW)
-	{
-		digitalWrite(relay_open, LOW);
-		state = 4; // Error
-	}
-	else
-	{
-		digitalWrite(relay_open, LOW);
-		get_state();
-	}
-	Serial.print(state);
-	Serial.print("#");
+
+	//time_count = millis();
+	
+	//while (millis() < (time_count + opening_time))
+	//{
+	//	if (digitalRead(sensor_open) == LOW)
+	//	{
+	//		opening = false;
+	//		state = 0; // Open
+	//		digitalWrite(relay_open, LOW);
+	//		break;
+	//	}
+	//}
+	//if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW)
+	//{
+	//	digitalWrite(relay_open, LOW);
+	//	state = 4; // Error
+	//}
+	//else
+	//{
+	//	digitalWrite(relay_open, LOW);
+	//	get_state();
+	//}
+	//Serial.print(state);
+	//Serial.print("#");
 }
 
 void close_roof()
 {
 	digitalWrite(relay_open, LOW);
 	digitalWrite(relay_close, HIGH);
-	time_count = millis();
 	closing = true;
-	while (millis() < (time_count + opening_time))
-	{
-		if (digitalRead(sensor_close) == LOW)
-		{
-			closing = false;
-			state = 1; // Closed
-			digitalWrite(relay_close, LOW);
-			break;
-		}
-	}
-	if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW)
-	{
-		digitalWrite(relay_close, LOW);
-		state = 4; // Error
-	}
-	else
-	{
-		digitalWrite(relay_close, LOW);
-		get_state();
-	}
-	Serial.print(state);
-	Serial.print("#");
+
+	//time_count = millis();
+	//while (millis() < (time_count + opening_time))
+	//{
+	//	if (digitalRead(sensor_close) == LOW)
+	//	{
+	//		closing = false;
+	//		state = 1; // Closed
+	//		digitalWrite(relay_close, LOW);
+	//		break;
+	//	}
+	//}
+	//if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW)
+	//{
+	//	digitalWrite(relay_close, LOW);
+	//	state = 4; // Error
+	//}
+	//else
+	//{
+	//	digitalWrite(relay_close, LOW);
+	//	get_state();
+	//}
+	//Serial.print(state);
+	//Serial.print("#");
 }
 
 void stop_roof()
 {
+	MsTimer2::stop();
 	digitalWrite(relay_open, LOW);
 	digitalWrite(relay_close, LOW);
 	opening = false;
@@ -170,10 +175,16 @@ void stop_roof()
 
 void is_open()
 {
-
+	MsTimer2::stop();
+	opening = false;
+	state = 0; // Open
+	digitalWrite(relay_open, LOW);
 }
 
 void is_closed()
 {
-
+	MsTimer2::stop();
+	closing = false;
+	state = 1; // Closed
+	digitalWrite(relay_close, LOW);
 }
