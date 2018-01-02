@@ -8,6 +8,7 @@ int relay_open = 8; // open relay pin
 int relay_close = 9; // close relay pin
 int sensor_open = 2; // open sensor pin
 int sensor_close = 3; // close sensor pin
+int heating = 7; // heating relay pin
 
 int state; //roof state
 boolean opening = false;
@@ -21,6 +22,7 @@ void setup() {
 	Serial.flush();
 	pinMode(relay_open, OUTPUT);
 	pinMode(relay_close, OUTPUT);
+	pinMode(heating, OUTPUT);
 	pinMode(sensor_open, INPUT);
 	digitalWrite(sensor_open, HIGH);
 	pinMode(sensor_close, INPUT);
@@ -137,4 +139,14 @@ void is_closed()
 	closing = false;
 	state = 1; // Closed
 	digitalWrite(relay_close, LOW);
+}
+
+void reils_heating_on()
+{
+	digitalWrite(heating, HIGH);
+}
+
+void reils_heating_off()
+{
+	digitalWrite(heating, LOW);
 }
