@@ -15,7 +15,7 @@
 #define __AVR_ATmega32u4__
 #define __AVR_ATmega32U4__
 #define F_CPU 16000000L
-#define ARDUINO 10805
+#define ARDUINO 10801
 #define ARDUINO_AVR_MICRO
 #define ARDUINO_ARCH_AVR
 #define USB_VID 0x2341
@@ -71,6 +71,7 @@ typedef void *__builtin_va_list;
 #undef PSTR
 #define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
 
+typedef unsigned char uint8_t;
 
 #define pgm_read_byte(address_short) uint8_t() 
 #define pgm_read_word(address_short) uint16_t() 

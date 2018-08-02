@@ -6,15 +6,15 @@ Author:	dromazan
 #include <MsTimer2.h>
 #include <EEPROM.h>
 
-int relay_open = 8; // open relay pin
-int relay_close = 9; // close relay pin
-int sensor_open = 2; // open sensor pin
-int sensor_close = 3; // close sensor pin
-int heating = 7; // heating relay pin
-int ir_led_pin = 5; //ir led pin
-int ir_sensor_pin = 6; // phototransistor pin
+#define relay_open 8	// open relay pin
+#define relay_close 9	// close relay pin
+#define sensor_open 2	// open sensor pin
+#define sensor_close 3	// close sensor pin
+#define heating 7		// heating relay pin
+#define ir_led_pin 5	//ir led pin
+#define ir_sensor_pin 6	// phototransistor pin
 
-int roof_position; // roof position
+int roof_position;		// roof position
 boolean raised = false;
 int eeAddress = 0;
 
