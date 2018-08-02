@@ -80,5 +80,6 @@ typedef unsigned char uint8_t;
 #define pgm_read_ptr(address_short)   short()
 
 #include "ASCOM roof driver.ino"
+#include "ASCOM roof driver L298M.ino"
 #endif
 #endif

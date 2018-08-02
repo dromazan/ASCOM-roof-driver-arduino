@@ -75,6 +75,9 @@
     <ProjectCapability Include="VisualMicro" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ASCOM roof driver L298M.ino">
+      <FileType>CppCode</FileType>
+    </None>
     <None Include="ASCOM roof driver.ino">
       <FileType>CppCode</FileType>
     </None>

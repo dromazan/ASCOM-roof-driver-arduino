@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ASCOM roof driver.ino" />
+    <None Include="ASCOM roof driver L298M.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.ASCOM roof driver.vsarduino.h">
