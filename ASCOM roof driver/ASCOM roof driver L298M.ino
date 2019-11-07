@@ -12,6 +12,12 @@ Author:	dromazan
 #define in1 8		// driver in1 pin
 #define in2 9		//driver in2 pin
 
+//Manual control elements
+#define btn_open 11
+#define btn_close 12
+#define switch_force 10
+#define park_sensor 14
+
 
 // #define relay_open 8	// open relay pin
 // #define relay_close 9	// close relay pin
@@ -29,6 +35,7 @@ int state = 7; //roof state
 int heat_state; //heating state
 boolean opening = false;
 boolean closing = false;
+boolean force = false;
 
 unsigned long opening_time = 40000; // time for roof opening in seconds
 
@@ -41,7 +48,11 @@ void setup() {
 	pinMode(heating, OUTPUT);
 	pinMode(sensor_open, INPUT);
 	pinMode(sensor_close, INPUT);
-
+	pinMode(btn_close, INPUT);
+	pinMode(btn_open, INPUT);
+	pinMode(switch_force, INPUT);
+	pinMode(park_sensor, INPUT);
+	
 	MsTimer2::set(opening_time, error_stop_roof); //setup timer
 
 	roof_position = EEPROM.read(eeAddress);
@@ -50,46 +61,72 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 
+	String str;
 	String cmd;
+	String param;
 
 	if (Serial.available() > 0)
 	{
-		cmd = Serial.readStringUntil('#');
+		str = Serial.readStringUntil('#');
 		//Serial.print(cmd);
-
-		if (cmd == "HANDSHAKE")
+		if (str.length() == 3)
 		{
-			Serial.print("HANDSHAKE");
+			cmd = str;
 		}
 
-		if (cmd == "GETSTATE")
+		if (str.length() == 6)
+		{
+			cmd = str.substring(0, 4);
+			param = str.substring(4);
+		}
+
+		if (cmd == "HSH") // handshake
+		{
+			Serial.print("HSH");
+		}
+
+		else if (cmd == "GST") // get state
 		{
 			get_state();
 		}
-		else if (cmd == "OPEN")
+		else if (cmd == "OPN") //open
 		{
 			open_roof();
 		}
-		else if (cmd == "CLOSE")
+		else if (cmd == "CLS") //close
 		{
 			close_roof();
 		}
-		else if (cmd == "STOP")
+		else if (cmd == "STP") //stop
 		{
 			stop_roof();
 		}
-		else if (cmd == "HEATON")
+		else if (cmd == "HON") //heat on
 		{
 			rails_heating_on();
 		}
-		else if (cmd == "HEATOFF")
+		else if (cmd == "HOF") //heat off
 		{
 			rails_heating_off();
 		}
-		else if (cmd == "HEATSTATE")
+		else if (cmd == "HST") //heat state
 		{
 			get_heat_state();
 		}
+		else
+		{
+			Serial.print("Bad request");
+		}
+	}
+
+	if (digitalRead(btn_open) == HIGH)
+	{
+		open_roof();
+	}
+
+	if (digitalRead(btn_close) == HIGH)
+	{
+		close_roof();
 	}
 }
 
