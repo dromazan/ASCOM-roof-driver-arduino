@@ -1,7 +1,7 @@
 /*
 Name:		ASCOM_Roof_arduino.ino
 Created:	12/15/2017 7:05:23 PM
-Author:	dromazan
+Author:		dromazan
 */
 #include <MsTimer2.h>
 #include <EEPROM.h>
@@ -224,8 +224,7 @@ void stop_roof()
 	MsTimer2::stop();
 	detachInterrupt(0);
 	detachInterrupt(1);
-	digitalWrite(relay_open, LOW);
-	digitalWrite(relay_close, LOW);
+	halt_motor();
 	opening = false;
 	closing = false;
 	state = 4; // Stop
@@ -237,8 +236,7 @@ void error_stop_roof()
 	MsTimer2::stop();
 	detachInterrupt(0);
 	detachInterrupt(1);
-	digitalWrite(relay_open, LOW);
-	digitalWrite(relay_close, LOW);
+	halt_motor();
 	opening = false;
 	closing = false;
 	state = 7; // Error
@@ -251,8 +249,7 @@ void triger_open()
 	Serial.print(state);
 	MsTimer2::start(); //start timer
 	attachInterrupt(0, is_open, LOW); // setup interrupt from open sensor
-	digitalWrite(in1, HIGH);
-	digitalWrite(in2, LOW);
+	turn_motor(1);
 	roof_progress_increment();
 }
 
@@ -262,8 +259,7 @@ void triger_close()
 	Serial.print(state);
 	MsTimer2::start(); //start timer
 	attachInterrupt(1, is_closed, LOW); // setup interrupt from open sensor
-	digitalWrite(in1, LOW);
-	digitalWrite(in2, HIGH);
+	turn_motor(0);
 }
 
 void is_open()
@@ -271,8 +267,7 @@ void is_open()
 	MsTimer2::stop();
 	detachInterrupt(0);
 	opening = false;
-	digitalWrite(in1, LOW);
-	digitalWrite(in2, LOW);
+	halt_motor();
 	state = 0; // Open
 	Serial.print(state);
 }
@@ -282,8 +277,7 @@ void is_closed()
 	MsTimer2::stop();
 	detachInterrupt(1);
 	closing = false;
-	digitalWrite(in1, LOW);
-	digitalWrite(in2, LOW);
+	halt_motor();
 	state = 1; // Closed
 	Serial.print(state);
 }
@@ -338,3 +332,25 @@ void roof_progress_decrement()
 		raised = true;
 	}
 }
+
+void turn_motor(int dir)
+{
+	if (dir == 1) //forward
+	{
+		digitalWrite(in1, LOW);
+		digitalWrite(in2, HIGH);
+	}
+
+	if (dir == 0) //backword
+	{
+		digitalWrite(in1, HIGH);
+		digitalWrite(in2, LOW);
+	}
+}
+
+void halt_motor()
+{
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
+}
+
