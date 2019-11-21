@@ -31,11 +31,12 @@ int roof_position;		// roof position
 boolean raised = false;
 int eeAddress = 0;
 
-int state = 7; //roof state
+int roof_state = 7; //roof state
 int heat_state; //heating state
 boolean opening = false;
 boolean closing = false;
 boolean force = false;
+boolean parked = false;
 
 unsigned long opening_time = 40000; // time for roof opening in seconds
 
@@ -72,9 +73,10 @@ void loop() {
 		if (str.length() == 3)
 		{
 			cmd = str;
+			param = "";
 		}
 
-		if (str.length() == 6)
+		if (str.length() == 4)
 		{
 			cmd = str.substring(0, 4);
 			param = str.substring(4);
@@ -91,11 +93,11 @@ void loop() {
 		}
 		else if (cmd == "OPN") //open
 		{
-			open_roof();
+			open_roof(param);
 		}
 		else if (cmd == "CLS") //close
 		{
-			close_roof();
+			close_roof(param);
 		}
 		else if (cmd == "STP") //stop
 		{
@@ -121,12 +123,12 @@ void loop() {
 
 	if (digitalRead(btn_open) == HIGH)
 	{
-		open_roof();
+		open_roof(); //add force switch control
 	}
 
 	if (digitalRead(btn_close) == HIGH)
 	{
-		close_roof();
+		close_roof(); // TODO: add force switch control
 	}
 }
 
@@ -143,77 +145,88 @@ void get_state()
 	*/
 	if (digitalRead(sensor_open) == LOW)
 	{
-		state = 0;
+		roof_state = 0;
 	}
 	if (digitalRead(sensor_close) == LOW)
 	{
-		state = 1;
+		roof_state = 1;
 	}
 	if (opening == true)
 	{
-		state = 2;
+		roof_state = 2;
 	}
 	if (closing == true)
 	{
-		state = 3;
+		roof_state = 3;
 	}
-	if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW && opening == false && closing == false && state != 4)
+	if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW && opening == false && closing == false && roof_state != 4)
 	{
-		state = 7; // Error
+		roof_state = 7; // Error
 	}
 
-	Serial.print(state);
+	Serial.print(roof_state);
 }
 
-void open_roof()
+void open_roof(String p)
 {
+	get_telescope_state();
+	
 	if (digitalRead(sensor_open) == LOW)
 	{
-		state = 0;
-		Serial.print(state);
+		roof_state = 0;
+		Serial.print(roof_state);
 	}
-	else if (digitalRead(sensor_close) == LOW)
+	if (roof_state == 2)
+	{
+		Serial.print(roof_state);
+	}
+
+	
+	if ((digitalRead(sensor_close) == LOW && p == "F") ||
+		(digitalRead(sensor_close) == LOW && p == ""  && parked == true))
 	{
 		triger_open();
 	}
-	else if (state == 2)
-	{
-		Serial.print(state);
-	}
-	else if (state == 3)
+
+	if (roof_state == 3) 
 	{
 		stop_roof();
 		delay(1500);
 		triger_open();
 	}
-	else if (state == 7 || state == 4)
+	
+	if (roof_state == 7 || roof_state == 4)
 	{
 		triger_open();
 	}
 }
 
-void close_roof()
+void close_roof(String p)
 {
 	if (digitalRead(sensor_close) == LOW)
 	{
-		state = 1;
-		Serial.print(state);
+		roof_state = 1;
+		Serial.print(roof_state);
 	}
-	else if (digitalRead(sensor_open) == LOW)
+	else if (roof_state == 3)
+	{
+		Serial.print(roof_state);
+	}
+
+
+	else if ((digitalRead(sensor_open) == LOW && p == "F") ||
+		(digitalRead(sensor_open) == LOW && p == ""  && parked == true))
 	{
 		triger_close();
 	}
-	else if (state == 3)
-	{
-		Serial.print(state);
-	}
-	else if (state == 2)
+
+	else if (roof_state == 2)
 	{
 		stop_roof();
 		delay(1500);
 		triger_close();
 	}
-	else if (state == 4 || state == 7)
+	else if (roof_state == 4 || roof_state == 7)
 	{
 		triger_close();
 	}
@@ -227,8 +240,8 @@ void stop_roof()
 	halt_motor();
 	opening = false;
 	closing = false;
-	state = 4; // Stop
-	Serial.print(state);
+	roof_state = 4; // Stop
+	Serial.print(roof_state);
 }
 
 void error_stop_roof()
@@ -239,14 +252,14 @@ void error_stop_roof()
 	halt_motor();
 	opening = false;
 	closing = false;
-	state = 7; // Error
-	Serial.print(state);
+	roof_state = 7; // Error
+	Serial.print(roof_state);
 }
 
 void triger_open()
 {
-	state = 2;
-	Serial.print(state);
+	roof_state = 2;
+	Serial.print(roof_state);
 	MsTimer2::start(); //start timer
 	attachInterrupt(0, is_open, LOW); // setup interrupt from open sensor
 	turn_motor(1);
@@ -255,8 +268,8 @@ void triger_open()
 
 void triger_close()
 {
-	state = 3;
-	Serial.print(state);
+	roof_state = 3;
+	Serial.print(roof_state);
 	MsTimer2::start(); //start timer
 	attachInterrupt(1, is_closed, LOW); // setup interrupt from open sensor
 	turn_motor(0);
@@ -268,8 +281,8 @@ void is_open()
 	detachInterrupt(0);
 	opening = false;
 	halt_motor();
-	state = 0; // Open
-	Serial.print(state);
+	roof_state = 0; // Open
+	Serial.print(roof_state);
 }
 
 void is_closed()
@@ -278,8 +291,8 @@ void is_closed()
 	detachInterrupt(1);
 	closing = false;
 	halt_motor();
-	state = 1; // Closed
-	Serial.print(state);
+	roof_state = 1; // Closed
+	Serial.print(roof_state);
 }
 
 void rails_heating_on()
@@ -352,5 +365,17 @@ void halt_motor()
 {
 	digitalWrite(in1, LOW);
 	digitalWrite(in2, LOW);
+}
+
+void get_telescope_state()
+{
+	if (digitalRead(park_sensor) == HIGH)
+	{
+		parked = true;
+	}
+	else if (digitalRead(park_sensor) == LOW)
+	{
+		parked = false;
+	}
 }
 

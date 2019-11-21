@@ -18,7 +18,7 @@ int roof_position;		// roof position
 boolean raised = false;
 int eeAddress = 0;
 
-int state = 7; //roof state
+int roof_state = 7; //roof state
 int heat_state; //heating state
 boolean opening = false;
 boolean closing = false;
@@ -99,50 +99,50 @@ void get_state()
 	*/
 	if (digitalRead(sensor_open) == LOW)
 	{
-		state = 0;
+		roof_state = 0;
 	}
 	if (digitalRead(sensor_close) == LOW)
 	{
-		state = 1;
+		roof_state = 1;
 	}
 	if (opening == true)
 	{
-		state = 2;
+		roof_state = 2;
 	}
 	if (closing == true)
 	{
-		state = 3;
+		roof_state = 3;
 	}
-	if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW && opening == false && closing == false && state != 4)
+	if (digitalRead(sensor_open) != LOW && digitalRead(sensor_close) != LOW && opening == false && closing == false && roof_state != 4)
 	{
-		state = 7; // Error
+		roof_state = 7; // Error
 	}
 
-	Serial.print(state);
+	Serial.print(roof_state);
 }
 
 void open_roof()
 {
 	if (digitalRead(sensor_open) == LOW)
 	{
-		state = 0;
-		Serial.print(state);
+		roof_state = 0;
+		Serial.print(roof_state);
 	}
 	else if (digitalRead(sensor_close) == LOW)
 	{
 		triger_open();
 	}
-	else if (state == 2)
+	else if (roof_state == 2)
 	{
-		Serial.print(state);
+		Serial.print(roof_state);
 	}
-	else if (state == 3)
+	else if (roof_state == 3)
 	{
 		stop_roof();
 		delay(1500);
 		triger_open();
 	}
-	else if (state == 7 || state == 4)
+	else if (roof_state == 7 || roof_state == 4)
 	{
 		triger_open();
 	}
@@ -152,24 +152,24 @@ void close_roof()
 {
 	if (digitalRead(sensor_close) == LOW)
 	{
-		state = 1;
-		Serial.print(state);
+		roof_state = 1;
+		Serial.print(roof_state);
 	}
 	else if (digitalRead(sensor_open) == LOW)
 	{
 		triger_close();
 	}
-	else if (state == 3)
+	else if (roof_state == 3)
 	{
-		Serial.print(state);
+		Serial.print(roof_state);
 	}
-	else if (state == 2)
+	else if (roof_state == 2)
 	{
 		stop_roof();
 		delay(1500);
 		triger_close();
 	}
-	else if (state == 4 || state == 7)
+	else if (roof_state == 4 || roof_state == 7)
 	{
 		triger_close();
 	}
@@ -184,8 +184,8 @@ void stop_roof()
 	digitalWrite(relay_close, LOW);
 	opening = false;
 	closing = false;
-	state = 4; // Stop
-	Serial.print(state);
+	roof_state = 4; // Stop
+	Serial.print(roof_state);
 }
 
 void error_stop_roof()
@@ -197,14 +197,14 @@ void error_stop_roof()
 	digitalWrite(relay_close, LOW);
 	opening = false;
 	closing = false;
-	state = 7; // Error
-	Serial.print(state);
+	roof_state = 7; // Error
+	Serial.print(roof_state);
 }
 
 void triger_open()
 {
-	state = 2;
-	Serial.print(state);
+	roof_state = 2;
+	Serial.print(roof_state);
 	MsTimer2::start(); //start timer
 	attachInterrupt(0, is_open, LOW); // setup interrupt from open sensor
 	digitalWrite(relay_close, LOW);
@@ -214,8 +214,8 @@ void triger_open()
 
 void triger_close()
 {
-	state = 3;
-	Serial.print(state);
+	roof_state = 3;
+	Serial.print(roof_state);
 	MsTimer2::start(); //start timer
 	attachInterrupt(1, is_closed, LOW); // setup interrupt from open sensor
 	digitalWrite(relay_open, LOW);
@@ -229,8 +229,8 @@ void is_open()
 	opening = false;
 	digitalWrite(relay_open, LOW);
 	digitalWrite(ir_led_pin, LOW);
-	state = 0; // Open
-	Serial.print(state);
+	roof_state = 0; // Open
+	Serial.print(roof_state);
 }
 
 void is_closed()
@@ -240,8 +240,8 @@ void is_closed()
 	closing = false;
 	digitalWrite(relay_close, LOW);
 	digitalWrite(ir_led_pin, LOW);
-	state = 1; // Closed
-	Serial.print(state); 
+	roof_state = 1; // Closed
+	Serial.print(roof_state); 
 }
 
 void rails_heating_on()
