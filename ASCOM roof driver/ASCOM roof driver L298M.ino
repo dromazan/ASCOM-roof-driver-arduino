@@ -2,6 +2,10 @@
 Name:		ASCOM_Roof_arduino.ino
 Created:	12/15/2017 7:05:23 PM
 Author:		dromazan
+
+TODO for 2023 season:
+- get rid of telescope park sensor and rails heating 
+
 */
 #include <MsTimer2.h>
 #include <EEPROM.h>
